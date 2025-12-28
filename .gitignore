@@ -1,0 +1,26 @@
+# Dart/Flutter
+.dart_tool/
+.packages
+.pub/
+build/
+coverage/
+*.log
+
+# Android
+android/.gradle/
+android/app/openJdk-25/
+android/app/openJdk-*/
+android/local.properties
+
+# iOS/macOS
+ios/Pods/
+ios/.symlinks/
+macos/Pods/
+
+# Windows/Linux ephemeral
+windows/flutter/ephemeral/
+linux/flutter/ephemeral/
+
+# Extra large artifacts (your case)
+**/*.track.dill
+**/firebase_cpp_sdk_windows_*.zip

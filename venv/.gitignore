@@ -1,0 +1,32 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+
+# Platform generated
+android/.gradle/
+android/app/build/
+android/local.properties
+
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+macos/Pods/
+
+# ✅ Your specific huge offenders
+android/app/openJdk-*/
+build/windows/x64/extracted/
+build/windows/x64/firebase_cpp_sdk_windows_*.zip
+**/*.dill.track.dill
