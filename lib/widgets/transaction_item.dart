@@ -23,10 +23,11 @@ class TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = isExpense ? const Color(0xFFEF4444) : const Color(0xFF22C55E);
+    final accent =
+        isExpense ? const Color(0xFFEF4444) : const Color(0xFF22C55E);
 
     return Material(
-      color: Colors.white.withOpacity(0.55),
+      color: Colors.white.withOpacity(0.9),
       borderRadius: BorderRadius.circular(22),
       child: InkWell(
         borderRadius: BorderRadius.circular(22),
@@ -35,10 +36,10 @@ class TransactionItem extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withOpacity(0.38)),
+            border: Border.all(color: Colors.grey.withOpacity(0.2)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06),
+                color: Colors.black.withOpacity(0.05),
                 blurRadius: 14,
                 offset: const Offset(0, 8),
               ),

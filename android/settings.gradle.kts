@@ -14,6 +14,7 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven { url = uri("https://storage.googleapis.com/download.flutter.io") } // <- ajout critique
     }
 }
 
@@ -22,6 +23,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://storage.googleapis.com/download.flutter.io") } // <- ajout critique
     }
 }
 

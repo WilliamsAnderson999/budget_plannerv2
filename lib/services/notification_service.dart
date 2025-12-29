@@ -3,7 +3,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -81,6 +80,57 @@ class NotificationService {
     }
   }
 
+  Future<void> showBudgetAlertNotification(
+      double currentExpense, double budget) async {
+    final percentage = (currentExpense / budget) * 100;
+    if (percentage >= 80) {
+      await showInstantNotification(
+        title: 'Alerte Budget',
+        body:
+            'Vous avez dépensé ${percentage.toStringAsFixed(0)}% de votre budget mensuel.',
+      );
+    }
+  }
+
+  Future<void> showInstantNotification({
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    try {
+      const AndroidNotificationDetails androidDetails =
+          AndroidNotificationDetails(
+        'instant_channel_id',
+        'Instant Notifications',
+        channelDescription: 'Instant notifications',
+        importance: Importance.defaultImportance,
+        priority: Priority.defaultPriority,
+      );
+
+      const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      );
+
+      const NotificationDetails platformDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      await _notificationsPlugin.show(
+        4,
+        title,
+        body,
+        platformDetails,
+        payload: payload,
+      );
+    } catch (e) {
+      debugPrint(
+          'Erreur lors de l\'affichage de la notification instantanée: $e');
+    }
+  }
+
   Future<void> scheduleBudgetReminder({
     required String title,
     required String body,
@@ -88,7 +138,6 @@ class NotificationService {
     String? payload,
   }) async {
     try {
-      // Créer le canal Android
       const AndroidNotificationDetails androidDetails =
           AndroidNotificationDetails(
         'budget_channel_id',
@@ -96,7 +145,6 @@ class NotificationService {
         channelDescription: 'Notifications for budget tracking and reminders',
         importance: Importance.high,
         priority: Priority.high,
-        ticker: 'ticker',
       );
 
       const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
@@ -119,6 +167,8 @@ class NotificationService {
         body,
         tzDateTime,
         platformDetails,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.dateAndTime,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         payload: payload,
@@ -404,6 +454,15 @@ class NotificationService {
       importance: Importance.max,
     );
 
+    // Canal pour les notifications instantanées
+    const AndroidNotificationChannel instantChannel =
+        AndroidNotificationChannel(
+      'instant_channel_id',
+      'Instant Notifications',
+      description: 'Instant notifications',
+      importance: Importance.defaultImportance,
+    );
+
     // Créer les canaux
     await _notificationsPlugin
         .resolvePlatformSpecificImplementation<
@@ -424,6 +483,11 @@ class NotificationService {
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(alertChannel);
+
+    await _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(instantChannel);
   }
 }
 

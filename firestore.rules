@@ -26,7 +26,8 @@ service cloud.firestore {
 
     // Users can read and write their own goals
     match /goals/{goalId} {
-      allow read, write: if true;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
   }
 }

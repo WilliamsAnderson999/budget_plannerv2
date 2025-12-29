@@ -33,11 +33,13 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordController.text,
       );
       Navigator.pushAndRemoveUntil(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(builder: (_) => const App()),
         (route) => false,
       );
     } catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Échec de la connexion : $e')),
       );
@@ -97,7 +99,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
             ),
             const SizedBox(height: 18),
-
             SoftCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,9 +125,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       hint: '••••••••',
                       icon: Icons.lock_rounded,
                       suffix: IconButton(
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                          _obscurePassword
+                              ? Icons.visibility_off_rounded
+                              : Icons.visibility_rounded,
                           color: AuthPalette.inkSoft,
                         ),
                       ),
@@ -137,10 +141,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Checkbox(
                         value: _rememberMe,
-                        onChanged: (v) => setState(() => _rememberMe = v ?? false),
+                        onChanged: (v) =>
+                            setState(() => _rememberMe = v ?? false),
                         activeColor: AuthPalette.ink,
                         checkColor: AuthPalette.cloud,
-                        side: BorderSide(color: AuthPalette.ink.withOpacity(0.25)),
+                        // ignore: deprecated_member_use
+                        side: BorderSide(
+                            color: AuthPalette.ink.withOpacity(0.25)),
                       ),
                       Text(
                         'Se souvenir',
@@ -154,16 +161,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+                            MaterialPageRoute(
+                                builder: (_) => const ForgotPasswordScreen()),
                           );
                         },
                         child: Text(
                           'Mot de passe oublié ?',
-                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                color: AuthPalette.ink,
-                                fontWeight: FontWeight.w800,
-                                decoration: TextDecoration.underline,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    color: AuthPalette.ink,
+                                    fontWeight: FontWeight.w800,
+                                    decoration: TextDecoration.underline,
+                                  ),
                         ),
                       ),
                     ],
@@ -177,20 +186,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       onTap: _isLoading ? null : _login,
                     ),
                   ),
-                  const SizedBox(height: 14),
-                  _divider(context, 'ou'),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(child: _SocialButton(label: 'Google', icon: Icons.g_mobiledata)),
-                      const SizedBox(width: 10),
-                      Expanded(child: _SocialButton(label: 'Apple', icon: Icons.apple)),
-                    ],
-                  ),
                 ],
               ),
             ),
-
             const SizedBox(height: 18),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -228,9 +226,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   TextStyle _fieldTextStyle(BuildContext context) {
     return Theme.of(context).textTheme.bodyLarge?.copyWith(
-          color: AuthPalette.ink,
-          fontWeight: FontWeight.w700,
-        ) ??
+              color: AuthPalette.ink,
+              fontWeight: FontWeight.w700,
+            ) ??
         const TextStyle(color: AuthPalette.ink);
   }
 
@@ -241,10 +239,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: AuthPalette.inkSoft, fontWeight: FontWeight.w600),
+      hintStyle: const TextStyle(
+          color: AuthPalette.inkSoft, fontWeight: FontWeight.w600),
       prefixIcon: Icon(icon, color: AuthPalette.inkSoft),
       suffixIcon: suffix,
       filled: true,
+      // ignore: deprecated_member_use
       fillColor: AuthPalette.cloud.withOpacity(0.75),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
@@ -252,11 +252,14 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
+        // ignore: deprecated_member_use
         borderSide: BorderSide(color: AuthPalette.cloud.withOpacity(0.6)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(color: AuthPalette.ink.withOpacity(0.35), width: 1.6),
+        // ignore: deprecated_member_use
+        borderSide:
+            BorderSide(color: AuthPalette.ink.withOpacity(0.35), width: 1.6),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
     );
@@ -270,25 +273,6 @@ class _LoginScreenState extends State<LoginScreen> {
             fontWeight: FontWeight.w900,
             letterSpacing: 0.8,
           ),
-    );
-  }
-
-  Widget _divider(BuildContext context, String text) {
-    return Row(
-      children: [
-        Expanded(child: Divider(color: AuthPalette.ink.withOpacity(0.15), height: 1)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text(
-            text,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: AuthPalette.inkSoft,
-                  fontWeight: FontWeight.w800,
-                ),
-          ),
-        ),
-        Expanded(child: Divider(color: AuthPalette.ink.withOpacity(0.15), height: 1)),
-      ],
     );
   }
 
@@ -328,7 +312,8 @@ class _PrimaryButton extends StatelessWidget {
                     height: 18,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(AuthPalette.cloud),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AuthPalette.cloud),
                     ),
                   )
                 : Text(
@@ -345,41 +330,6 @@ class _PrimaryButton extends StatelessWidget {
   }
 }
 
-class _SocialButton extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  const _SocialButton({required this.label, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AuthPalette.cloud.withOpacity(0.70),
-      borderRadius: BorderRadius.circular(999),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: () {},
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: AuthPalette.ink, size: 22),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: AuthPalette.ink,
-                      fontWeight: FontWeight.w900,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _CircleButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
@@ -389,6 +339,7 @@ class _CircleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
+      // ignore: deprecated_member_use
       color: AuthPalette.cloud.withOpacity(0.55),
       shape: const CircleBorder(),
       child: InkWell(

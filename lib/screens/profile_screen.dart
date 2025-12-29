@@ -5,8 +5,10 @@ import 'package:budget_manager/theme/app_theme.dart';
 import 'package:budget_manager/theme/auth_palette.dart';
 import 'package:budget_manager/screens/login_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:budget_manager/services/theme_service.dart';
 import 'package:budget_manager/services/auth_service.dart';
 import 'package:budget_manager/services/firestore_service.dart';
+import 'package:budget_manager/services/transaction_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,16 +18,18 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late String _userName;
-  late String _userEmail;
-  late String _userSince;
+  late String _userName = 'Utilisateur';
+  late String _userEmail = '';
+  late String _userSince = '';
 
   double _monthlyBudget = 2000.00;
   String _currency = 'USD';
   bool _notificationsEnabled = true;
   bool _biometricEnabled = false;
-  bool _darkMode = true;
   String _language = 'Français';
+  int _goalsCount = 0;
+  int _categoriesCount = 0;
+  int _transactionsCount = 0;
 
   Color _a(Color c, double o) => c.withAlpha((o * 255).round());
 
@@ -37,10 +41,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
     final authService = Provider.of<AuthService>(context, listen: false);
-    _userName = authService.currentUser?.displayName ?? 'User';
-    _userEmail = authService.currentUser?.email ?? 'email@example.com';
-    _userSince = 'Mai 2023'; // TODO: get from Firestore
+    final firestoreService =
+        Provider.of<FirestoreService>(context, listen: false);
+    final transactionService =
+        Provider.of<TransactionService>(context, listen: false);
+
+    final user = authService.currentUser;
+    if (user != null) {
+      try {
+        final userData = await firestoreService.getUser(user.uid);
+        final goals = await firestoreService.getGoals(user.uid);
+        final transactions = transactionService.transactions;
+        final categories = transactions.map((t) => t.category).toSet().toList();
+
+        if (userData != null && mounted) {
+          setState(() {
+            _userName = userData.fullName;
+            _userEmail = userData.email;
+            _monthlyBudget = userData.monthlyBudget;
+            _currency = userData.currency;
+            _notificationsEnabled = userData.notificationsEnabled;
+            _biometricEnabled = userData.biometricEnabled;
+            _userSince = userData.createdAt.toLocal().toString().split(' ')[0];
+            _goalsCount = goals.length;
+            _categoriesCount = categories.length;
+            _transactionsCount = transactionService.transactions.length;
+          });
+        } else {
+          // Fallback to auth data
+          setState(() {
+            _userName = user.displayName ?? 'Bienvenue';
+            _userEmail = user.email ?? 'email@example.com';
+            _userSince = 'Date inconnue';
+            _goalsCount = goals.length;
+            final transactions = transactionService.transactions;
+            final categories =
+                transactions.map((t) => t.category).toSet().toList();
+            _categoriesCount = categories.length;
+            _transactionsCount = transactionService.transactions.length;
+          });
+        }
+      } catch (e) {
+        // Fallback to auth data
+        setState(() {
+          _userName = user.displayName ?? 'Bienvenue';
+          _userEmail = user.email ?? 'email@example.com';
+          _userSince = 'Date inconnue';
+          _goalsCount = 0;
+          final transactions = transactionService.transactions;
+          final categories =
+              transactions.map((t) => t.category).toSet().toList();
+          _categoriesCount = categories.length;
+          _transactionsCount = 0;
+        });
+      }
+    }
   }
 
   @override
@@ -57,7 +117,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           scrolledUnderElevation: 0,
           title: Text(
             'Profil',
-            style: Theme.of(context).textTheme.headlineMedium,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: AuthPalette.ink,
+                  fontWeight: FontWeight.w900,
+                ),
           ),
           actions: [
             Padding(
@@ -227,7 +290,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Expanded(
                   child: _GlassStatCard(
                     title: 'Transactions',
-                    value: '127',
+                    value: '$_transactionsCount',
                     icon: Icons.receipt_long_outlined,
                     tint: AuthPalette.peach,
                   ),
@@ -236,7 +299,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Expanded(
                   child: _GlassStatCard(
                     title: 'Catégories',
-                    value: '8',
+                    value: '$_categoriesCount',
                     icon: Icons.category_outlined,
                     tint: AuthPalette.lavender,
                   ),
@@ -245,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Expanded(
                   child: _GlassStatCard(
                     title: 'Objectifs',
-                    value: '3',
+                    value: '$_goalsCount',
                     icon: Icons.flag_outlined,
                     tint: AuthPalette.mint,
                   ),
@@ -285,7 +348,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onChanged: (value) => setState(() {
                     _notificationsEnabled = value;
                   }),
-                  activeColor: AuthPalette.tangerine,
+                  activeThumbColor: AuthPalette.tangerine,
                 ),
               ),
               _buildSettingItem(
@@ -298,14 +361,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onChanged: (value) => setState(() {
                     _biometricEnabled = value;
                   }),
-                  activeColor: AuthPalette.tangerine,
+                  activeThumbColor: AuthPalette.tangerine,
                 ),
               ),
               _buildSettingItem(
                 icon: Icons.credit_card_outlined,
                 iconTint: AuthPalette.mint,
                 title: 'Carte de crédit',
-                subtitle: 'Connecter votre carte pour transactions automatiques',
+                subtitle:
+                    'Connecter votre carte pour transactions automatiques',
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Fonctionnalité à venir')),
@@ -316,13 +380,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 icon: Icons.dark_mode_outlined,
                 iconTint: AuthPalette.sea,
                 title: 'Mode sombre',
-                subtitle: _darkMode ? 'Activé' : 'Désactivé',
+                subtitle: context.watch<ThemeService>().isDarkMode
+                    ? 'Activé'
+                    : 'Désactivé',
                 trailing: Switch(
-                  value: _darkMode,
-                  onChanged: (value) => setState(() {
-                    _darkMode = value;
-                  }),
-                  activeColor: AuthPalette.tangerine,
+                  value: context.watch<ThemeService>().isDarkMode,
+                  onChanged: (value) {
+                    context.read<ThemeService>().setDarkMode(value);
+                  },
+                  activeThumbColor: AuthPalette.tangerine,
                 ),
               ),
               _buildSettingItem(
@@ -413,7 +479,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     builder: (context) => AlertDialog(
                       backgroundColor: _a(Colors.white, 0.95),
                       title: const Text('Conditions d\'utilisation'),
-                      content: const Text('Conditions d\'utilisation de l\'app.'),
+                      content:
+                          const Text('Conditions d\'utilisation de l\'app.'),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context),
@@ -658,11 +725,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _userEmail = emailController.text;
                   });
 
+                  // ignore: use_build_context_synchronously
                   Navigator.pop(context);
+                  // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Profil mis à jour')),
                   );
                 } catch (e) {
+                  // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Erreur: $e')),
                   );

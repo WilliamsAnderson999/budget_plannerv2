@@ -44,6 +44,117 @@ class _SearchScreenState extends State<SearchScreen> {
     _loadInitialResults();
   }
 
+  void _showTransactionDetails(Map<String, dynamic> transaction) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: (transaction['isExpense'] as bool
+                              ? const Color(0xFFEF4444)
+                              : const Color(0xFF22C55E))
+                          .withOpacity(0.14),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                          color: (transaction['isExpense'] as bool
+                                  ? const Color(0xFFEF4444)
+                                  : const Color(0xFF22C55E))
+                              .withOpacity(0.25)),
+                    ),
+                    child: Icon(
+                      transaction['icon'] as IconData,
+                      color: AppTheme.textPrimary,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          transaction['title'] as String,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
+                                color: AppTheme.textPrimary,
+                                fontWeight: FontWeight.w900,
+                              ),
+                        ),
+                        Text(
+                          transaction['category'] as String,
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: AppTheme.textSecondary,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    '${transaction['isExpense'] as bool ? '-' : '+'}\$${(transaction['amount'] as double).toStringAsFixed(2)}',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: transaction['isExpense'] as bool
+                              ? const Color(0xFFEF4444)
+                              : const Color(0xFF22C55E),
+                          fontWeight: FontWeight.w900,
+                        ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Details: ${transaction['subtitle'] as String}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              const SizedBox(height: 24),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    'Fermer',
+                    style: TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,8 +166,8 @@ class _SearchScreenState extends State<SearchScreen> {
             pinned: true,
             floating: true,
             backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        scrolledUnderElevation: 0,
+            surfaceTintColor: Colors.transparent,
+            scrolledUnderElevation: 0,
             expandedHeight: 120,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding:
@@ -172,6 +283,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     amount: transaction['amount'] as double,
                     isExpense: transaction['isExpense'] as bool,
                     icon: transaction['icon'] as IconData,
+                    onTap: () => _showTransactionDetails(transaction),
                   ),
                 );
               },

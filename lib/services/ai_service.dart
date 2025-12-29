@@ -1,14 +1,13 @@
 import 'dart:convert';
-import 'package:firebase_ai/firebase_ai.dart';
+import 'package:http/http.dart' as http;
 import 'package:budget_manager/models/transaction.dart';
 import 'package:budget_manager/models/goal.dart';
 
 class AIService {
-  late final GenerativeModel _model;
-
-  AIService() {
-    _model = FirebaseAI.googleAI().generativeModel(model: 'gemini-1.5-flash');
-  }
+  static const String _apiKey =
+      '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';
+  static const String _baseUrl =
+      'https://openrouter.ai/api/v1/chat/completions';
 
   List<Transaction> _getRecentTransactions(
       List<Transaction> transactions, int limit) {
@@ -17,17 +16,49 @@ class AIService {
     return sorted.take(limit).toList();
   }
 
+  Future<String> _callOpenRouter(String prompt) async {
+    try {
+      final response = await http.post(
+        Uri.parse(_baseUrl),
+        headers: {
+          'Authorization': 'Bearer $_apiKey',
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://budget-planner-app.com', // Optional
+          'X-Title': 'Budget Planner AI Assistant', // Optional
+        },
+        body: jsonEncode({
+          'model':
+              'x-ai/grok-code-fast-1', // Using Grok Code Fast 1 for efficiency
+          'messages': [
+            {'role': 'user', 'content': prompt}
+          ],
+          'temperature': 0.7,
+          'max_tokens': 2000,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['choices'][0]['message']['content'] ??
+            'Erreur: réponse vide';
+      } else {
+        throw Exception(
+            'Erreur API: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Erreur lors de l\'appel à OpenRouter: $e');
+    }
+  }
+
   Future<String> analyzeTransactions(
       List<Transaction> transactions, List<Goal> goals) async {
     try {
       final limitedTransactions = _getRecentTransactions(transactions, 10);
       final prompt = _createTransactionSummary(limitedTransactions, goals);
-      final content = [Content.text(prompt)];
-      final response = await _model.generateContent(content);
-      return response.text ??
-          'Je ne peux pas analyser vos données pour le moment.';
+      final response = await _callOpenRouter(prompt);
+      return response;
     } catch (e) {
-      return 'Erreur lors de l\'analyse: $e';
+      return 'Je ne peux pas analyser vos données pour le moment. Erreur: $e';
     }
   }
 
@@ -37,10 +68,8 @@ class AIService {
       final limitedTransactions =
           _getRecentTransactions(transactions, 20); // More for prediction
       final prompt = _createPredictionData(limitedTransactions, goals);
-      final content = [Content.text(prompt)];
-      final response = await _model.generateContent(content);
-      final contentText = response.text ?? '';
-      return _parsePredictionResponse(contentText);
+      final response = await _callOpenRouter(prompt);
+      return _parsePredictionResponse(response);
     } catch (e) {
       return {
         'total': 0.0,
@@ -56,10 +85,8 @@ class AIService {
     try {
       final limitedTransactions = _getRecentTransactions(transactions, 10);
       final prompt = _createTipsPrompt(limitedTransactions, goals);
-      final content = [Content.text(prompt)];
-      final response = await _model.generateContent(content);
-      final contentText = response.text ?? '';
-      return _extractTips(contentText);
+      final response = await _callOpenRouter(prompt);
+      return _extractTips(response);
     } catch (e) {
       return [
         'Établissez un budget mensuel réaliste',
@@ -278,16 +305,10 @@ class AIService {
       
       Réponds en tant qu'assistant financier expert. Sois utile, précis et encourageant. Concentre-toi sur la gestion budgétaire, les investissements et les conseils financiers.
       ''';
-      final content = [Content.text(prompt)];
-      final response = await _model.generateContent(content);
-      return response.text ?? 'Désolé, je n\'ai pas pu générer une réponse.';
+      final response = await _callOpenRouter(prompt);
+      return response;
     } catch (e) {
-      if (e.toString().contains('quota') ||
-          e.toString().contains('rate limit') ||
-          e.toString().contains('429')) {
-        return 'Quota atteint. Réessayez dans quelques minutes ou passez au forfait payant Blaze.';
-      }
-      return 'Erreur lors de la génération de la réponse: $e';
+      return 'Désolé, je n\'ai pas pu générer une réponse. Erreur: $e';
     }
   }
 }

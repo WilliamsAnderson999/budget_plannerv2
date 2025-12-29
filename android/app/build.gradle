@@ -5,7 +5,6 @@ plugins {
     id "com.google.gms.google-services"
 }
 
-// Les définitions de variables déplacées ici, APRÈS le bloc plugins {}
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -30,24 +29,25 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace = "com.example.budget_manager"
+    namespace = "com.example.budget_plannerv2"
     compileSdk 36
+
+    defaultConfig {
+        applicationId = "com.example.budget_plannerv2"
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion 36
+        versionCode = flutterVersionCode.toInteger()
+        versionName = flutterVersionName
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
         jvmTarget = '1.8'
-    }
-
-    defaultConfig {
-        applicationId = "com.example.budget_manager"
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 36
-        versionCode = 1
-        versionName = "1.0"
     }
 
     buildTypes {
@@ -62,9 +62,11 @@ flutter {
 }
 
 dependencies {
-    implementation 'com.google.firebase:firebase-bom:33.0.0'
+    implementation platform('com.google.firebase:firebase-bom:33.0.0')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-storage'
+
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.3"
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:budget_manager/theme/app_theme.dart';
+import 'package:budget_manager/theme/auth_palette.dart';
 import 'package:budget_manager/widgets/transaction_item.dart';
 import 'package:provider/provider.dart';
 import 'package:budget_manager/services/transaction_service.dart';
@@ -46,6 +47,117 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  void _showTransactionDetails(Map<String, dynamic> transaction) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: (transaction['isExpense'] as bool
+                              ? const Color(0xFFEF4444)
+                              : const Color(0xFF22C55E))
+                          .withOpacity(0.14),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                          color: (transaction['isExpense'] as bool
+                                  ? const Color(0xFFEF4444)
+                                  : const Color(0xFF22C55E))
+                              .withOpacity(0.25)),
+                    ),
+                    child: Icon(
+                      transaction['icon'] as IconData,
+                      color: AuthPalette.ink,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          transaction['title'] as String,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
+                                color: AuthPalette.ink,
+                                fontWeight: FontWeight.w900,
+                              ),
+                        ),
+                        Text(
+                          transaction['category'] as String,
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: AuthPalette.inkSoft,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    '${transaction['isExpense'] as bool ? '-' : '+'}\$${(transaction['amount'] as double).toStringAsFixed(2)}',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: transaction['isExpense'] as bool
+                              ? const Color(0xFFEF4444)
+                              : const Color(0xFF22C55E),
+                          fontWeight: FontWeight.w900,
+                        ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Time: ${transaction['subtitle'] as String}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AuthPalette.ink,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              const SizedBox(height: 24),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    'Fermer',
+                    style: TextStyle(
+                      color: AuthPalette.ink,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -58,7 +170,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           scrolledUnderElevation: 0,
           title: Text(
             'Dashboard',
-            style: Theme.of(context).textTheme.headlineMedium,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: AuthPalette.ink,
+                  fontWeight: FontWeight.w900,
+                ),
           ),
           actions: [
             IconButton(
@@ -162,6 +277,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   shape: BoxShape.circle,
                 ),
                 todayDecoration: BoxDecoration(
+                  // ignore: deprecated_member_use
                   color: AppTheme.accentBronze.withOpacity(0.2),
                   shape: BoxShape.circle,
                   border: Border.all(color: AppTheme.accentBronze),
@@ -227,6 +343,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   return Container(
                     margin: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
+                      // ignore: deprecated_member_use
                       color: AppTheme.accentBronze.withOpacity(0.2),
                       shape: BoxShape.circle,
                       border: Border.all(color: AppTheme.accentBronze),
@@ -361,6 +478,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       amount: transaction['amount'] as double,
                       isExpense: transaction['isExpense'] as bool,
                       icon: transaction['icon'] as IconData,
+                      onTap: () => _showTransactionDetails(transaction),
                     ),
                   );
                 }),

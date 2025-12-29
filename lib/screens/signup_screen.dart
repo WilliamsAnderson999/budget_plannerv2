@@ -70,7 +70,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
             ),
             const SizedBox(height: 16),
-
             SoftCard(
               child: Form(
                 key: _formKey,
@@ -125,9 +124,12 @@ class _SignupScreenState extends State<SignupScreen> {
                         hint: 'Au moins 6 caractères',
                         icon: Icons.lock_rounded,
                         suffix: IconButton(
-                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                          onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword),
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                            _obscurePassword
+                                ? Icons.visibility_off_rounded
+                                : Icons.visibility_rounded,
                             color: AuthPalette.inkSoft,
                           ),
                         ),
@@ -153,9 +155,13 @@ class _SignupScreenState extends State<SignupScreen> {
                         hint: 'Répétez votre mot de passe',
                         icon: Icons.lock_outline_rounded,
                         suffix: IconButton(
-                          onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                          onPressed: () => setState(() =>
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword),
                           icon: Icon(
-                            _obscureConfirmPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off_rounded
+                                : Icons.visibility_rounded,
                             color: AuthPalette.inkSoft,
                           ),
                         ),
@@ -185,7 +191,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 18),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -274,7 +279,8 @@ class _SignupScreenState extends State<SignupScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (!_acceptTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Veuillez accepter les conditions d'utilisation")),
+        const SnackBar(
+            content: Text("Veuillez accepter les conditions d'utilisation")),
       );
       return;
     }
@@ -305,9 +311,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
   TextStyle _fieldTextStyle(BuildContext context) {
     return Theme.of(context).textTheme.bodyLarge?.copyWith(
-          color: AuthPalette.ink,
-          fontWeight: FontWeight.w700,
-        ) ??
+              color: AuthPalette.ink,
+              fontWeight: FontWeight.w700,
+            ) ??
         const TextStyle(color: AuthPalette.ink);
   }
 
@@ -318,7 +324,8 @@ class _SignupScreenState extends State<SignupScreen> {
   }) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: AuthPalette.inkSoft, fontWeight: FontWeight.w600),
+      hintStyle: const TextStyle(
+          color: AuthPalette.inkSoft, fontWeight: FontWeight.w600),
       prefixIcon: Icon(icon, color: AuthPalette.inkSoft),
       suffixIcon: suffix,
       filled: true,
@@ -329,11 +336,14 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
+        // ignore: deprecated_member_use
         borderSide: BorderSide(color: AuthPalette.cloud.withOpacity(0.6)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(color: AuthPalette.ink.withOpacity(0.35), width: 1.6),
+        // ignore: deprecated_member_use
+        borderSide:
+            BorderSide(color: AuthPalette.ink.withOpacity(0.35), width: 1.6),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
     );
@@ -388,7 +398,8 @@ class _PrimaryButton extends StatelessWidget {
                     height: 18,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(AuthPalette.cloud),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AuthPalette.cloud),
                     ),
                   )
                 : Text(

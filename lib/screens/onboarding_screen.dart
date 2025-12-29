@@ -68,7 +68,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ],
             ),
           ),
-
           Expanded(
             child: PageView.builder(
               controller: _controller,
@@ -109,26 +108,36 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               Text(
                                 p.headline,
                                 textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                                      fontSize: headlineFont,
-                                      color: AuthPalette.cloud,
-                                      fontWeight: FontWeight.w900,
-                                      height: 0.95,
-                                      letterSpacing: -0.8,
-                                      shadows: [
-                                        Shadow(
-                                          color: Colors.black.withOpacity(0.10),
-                                          blurRadius: 20,
-                                          offset: const Offset(0, 10),
-                                        )
-                                      ],
-                                    ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displayMedium
+                                    ?.copyWith(
+                                  fontSize: headlineFont,
+                                  color: AuthPalette.cloud,
+                                  fontWeight: FontWeight.w900,
+                                  height: 0.95,
+                                  letterSpacing: -0.8,
+                                  shadows: [
+                                    Shadow(
+                                      color: AuthPalette.ink.withValues(
+                                          alpha:
+                                              25), // Fixed: was Colors.black.withOpacity(0.10)
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 10),
+                                    )
+                                  ],
+                                ),
                               ),
                               const SizedBox(height: 10),
                               Text(
                                 _prettyDate(DateTime.now()),
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      color: AuthPalette.cloud.withOpacity(0.95),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      color: AuthPalette.cloud.withValues(
+                                          alpha:
+                                              242), // Fixed: was AuthPalette.cloud.withOpacity(0.95)
                                       fontWeight: FontWeight.w700,
                                     ),
                               ),
@@ -136,7 +145,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               Text(
                                 p.subline,
                                 textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
                                       color: AuthPalette.ink,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -153,7 +165,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               },
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 18),
             child: Column(
@@ -174,7 +185,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                     const Spacer(),
                     _PrimaryPillButton(
-                      label: _page == _pages.length - 1 ? 'Commencer' : 'Suivant',
+                      label:
+                          _page == _pages.length - 1 ? 'Commencer' : 'Suivant',
                       onTap: _page == _pages.length - 1 ? _goToLogin : _next,
                     ),
                   ],
@@ -188,7 +200,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _chipsRow(int index) {
-    final palette = AuthPalette.chipPalettes[index % AuthPalette.chipPalettes.length];
+    final palette =
+        AuthPalette.chipPalettes[index % AuthPalette.chipPalettes.length];
     final chips = _pages[index].chips;
     return Wrap(
       spacing: 10,
@@ -216,8 +229,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           width: active ? 26 : 8,
           decoration: BoxDecoration(
             color: active
-                ? AuthPalette.ink.withOpacity(0.85)
-                : AuthPalette.cloud.withOpacity(0.55),
+                ? AuthPalette.ink.withValues(
+                    alpha: 217) // Fixed: was AuthPalette.ink.withOpacity(0.85)
+                : AuthPalette.cloud.withValues(
+                    alpha:
+                        140), // Fixed: was AuthPalette.cloud.withOpacity(0.55)
             borderRadius: BorderRadius.circular(99),
           ),
         );
@@ -281,7 +297,8 @@ class _CircleIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AuthPalette.cloud.withOpacity(0.55),
+      color: AuthPalette.cloud.withValues(
+          alpha: 140), // Fixed: was AuthPalette.cloud.withOpacity(0.55)
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -322,7 +339,8 @@ class _PrimaryPillButton extends StatelessWidget {
                     ),
               ),
               const SizedBox(width: 8),
-              const Icon(Icons.arrow_forward_rounded, color: AuthPalette.cloud, size: 18),
+              const Icon(Icons.arrow_forward_rounded,
+                  color: AuthPalette.cloud, size: 18),
             ],
           ),
         ),

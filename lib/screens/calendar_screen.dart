@@ -25,6 +25,120 @@ class _CalendarScreenState extends State<CalendarScreen> {
     _selectedDay = DateTime.now();
   }
 
+  void _showTransactionDetails(Map<String, dynamic> transaction) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: (transaction['isExpense'] as bool
+                              ? const Color(0xFFEF4444)
+                              : const Color(0xFF22C55E))
+                          .withOpacity(0.14),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                          color: (transaction['isExpense'] as bool
+                                  ? const Color(0xFFEF4444)
+                                  : const Color(0xFF22C55E))
+                              .withOpacity(0.25)),
+                    ),
+                    child: Icon(
+                      transaction['icon'] as IconData,
+                      color: Theme.of(context).colorScheme.onSurface,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          transaction['title'] as String,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.w900,
+                              ),
+                        ),
+                        Text(
+                          transaction['category'] as String,
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.6),
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    '${transaction['isExpense'] as bool ? '-' : '+'}\$${(transaction['amount'] as double).toStringAsFixed(2)}',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: transaction['isExpense'] as bool
+                              ? const Color(0xFFEF4444)
+                              : const Color(0xFF22C55E),
+                          fontWeight: FontWeight.w900,
+                        ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Time: ${transaction['subtitle'] as String}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              const SizedBox(height: 24),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    'Fermer',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -32,7 +146,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         SliverAppBar(
           pinned: true,
           floating: true,
-          backgroundColor: AppTheme.surfaceBlack,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text(
             'Dashboard',
             style: Theme.of(context).textTheme.headlineMedium,
@@ -122,7 +236,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           child: Container(
             margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppTheme.cardBlack,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
               boxShadow: AppTheme.cardShadow,
             ),
@@ -157,6 +271,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   shape: BoxShape.circle,
                 ),
                 todayDecoration: BoxDecoration(
+                  // ignore: deprecated_member_use
                   color: AppTheme.accentBronze.withOpacity(0.2),
                   shape: BoxShape.circle,
                   border: Border.all(color: AppTheme.accentBronze),
@@ -183,10 +298,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
               // Style des jours
               daysOfWeekStyle: DaysOfWeekStyle(
                 weekdayStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: AppTheme.textSecondary,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.6),
                     ),
                 weekendStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: AppTheme.textSecondary,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.6),
                     ),
               ),
 
@@ -211,7 +332,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       child: Text(
                         '${day.day}',
                         style: TextStyle(
-                          color: AppTheme.primaryBlack,
+                          color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -222,6 +343,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   return Container(
                     margin: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
+                      // ignore: deprecated_member_use
                       color: AppTheme.accentBronze.withOpacity(0.2),
                       shape: BoxShape.circle,
                       border: Border.all(color: AppTheme.accentBronze),
@@ -295,7 +417,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppTheme.surfaceBlack,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
             ),
             child: Row(
@@ -356,6 +478,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       amount: transaction['amount'] as double,
                       isExpense: transaction['isExpense'] as bool,
                       icon: transaction['icon'] as IconData,
+                      onTap: () => _showTransactionDetails(transaction),
                     ),
                   );
                 }),
@@ -366,7 +489,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             Container(
               padding: const EdgeInsets.all(40),
               decoration: BoxDecoration(
-                color: AppTheme.surfaceBlack,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
               ),
               child: Column(
@@ -385,7 +508,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   Text(
                     'Aucune transaction enregistrée pour cette date',
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: AppTheme.textSecondary,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.6),
                         ),
                     textAlign: TextAlign.center,
                   ),
@@ -487,6 +613,7 @@ class TransactionItem extends StatelessWidget {
   final double amount;
   final bool isExpense;
   final IconData icon;
+  final VoidCallback? onTap; // Add this field
 
   const TransactionItem({
     super.key,
@@ -496,55 +623,61 @@ class TransactionItem extends StatelessWidget {
     required this.amount,
     required this.isExpense,
     required this.icon,
+    this.onTap, // Add this to the constructor
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.cardBlack,
-        borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
-        boxShadow: AppTheme.cardShadow,
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceBlack,
-              borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      // Wrap in GestureDetector to handle taps
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.cardBlack,
+          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
+          boxShadow: AppTheme.cardShadow,
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceBlack,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: isExpense ? AppTheme.expenseColor : AppTheme.incomeColor,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: isExpense ? AppTheme.expenseColor : AppTheme.incomeColor,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
+            Text(
+              '${isExpense ? '-' : '+'}\$${amount.toStringAsFixed(2)}',
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: isExpense
+                        ? AppTheme.expenseColor
+                        : AppTheme.incomeColor,
+                  ),
             ),
-          ),
-          Text(
-            '${isExpense ? '-' : '+'}\$${amount.toStringAsFixed(2)}',
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  color:
-                      isExpense ? AppTheme.expenseColor : AppTheme.incomeColor,
-                ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

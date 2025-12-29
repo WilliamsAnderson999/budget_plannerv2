@@ -32,8 +32,6 @@ class _AppState extends State<App> {
 
   void _onItemTapped(int index) => setState(() => _selectedIndex = index);
 
-  static Color _a(Color c, double o) => c.withAlpha((o * 255).round());
-
   void _openAIChat() {
     showDialog(
       context: context,
@@ -43,14 +41,44 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    const whiteGradient = LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [Colors.white, Colors.white],
-    );
+    // Define gradients based on selected screen
+    LinearGradient getGradient() {
+      switch (_selectedIndex) {
+        case 0: // Home
+          return const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [AuthPalette.tangerine, AuthPalette.mint],
+          );
+        case 1: // Analysis
+          return const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFF5F5F5), Color(0xFFF5F5F5)],
+          );
+        case 2: // Transactions
+          return const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFF5F5F5), Color(0xFFF5F5F5)],
+          );
+        case 3: // Dashboard
+          return const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFF5F5F5), Color(0xFFF5F5F5)],
+          );
+        default: // Profile
+          return const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFF5F5F5), Color(0xFFF5F5F5)],
+          );
+      }
+    }
 
     return AuthBackground(
-      gradient: whiteGradient,
+      gradient: getGradient(),
       safeAreaTop: false,
       safeAreaBottom: false,
       child: Scaffold(
@@ -76,6 +104,7 @@ class _AppState extends State<App> {
                 borderRadius: BorderRadius.circular(18),
               ),
               child: const Icon(Icons.smart_toy, size: 24),
+              heroTag: "ai_fab",
             );
           }
 
@@ -97,6 +126,7 @@ class _AppState extends State<App> {
                 borderRadius: BorderRadius.circular(18),
               ),
               child: const Icon(Icons.add, size: 26),
+              heroTag: "add_transaction_fab",
             );
           }
 
